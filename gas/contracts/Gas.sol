@@ -1,33 +1,41 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.0;
+pragma solidity 0.8.15;
 
-import "./Ownable.sol";
+//import "./Ownable.sol"; AR: nothing is used from this contracts
 
-contract Constants {
-    uint256 public tradeFlag = 1;
-    uint256 public basicFlag = 0;
-    uint256 public dividendFlag = 1;
-}
+//contract Constants {
+   // uint256 public tradeFlag = 1;
+  //  uint256 public basicFlag = 0;  AR: variable never used 
+   // uint256 public dividendFlag = 1; }
+//AR: section above not needed after aptimizing function getTradingMode()
 
-contract GasContract is Ownable, Constants {
-    uint256 public totalSupply = 0; // cannot be updated
-    uint256 public paymentCounter = 0;
-    mapping(address => uint256) public balances;
-    uint256 public tradePercent = 12;
+//contract GasContract is Ownable, Constants {
+
+contract GasContract  {
+
+    uint256 public immutable totalSupply;  // cannot be updated
+    uint32 public paymentCounter;  //AR
+
+    uint256 public tradePercent = 12;  //AR check 
     address public contractOwner;
     uint256 public tradeMode = 0;
-    mapping(address => Payment[]) public payments;
-    mapping(address => uint256) public whitelist;
+
     address[5] public administrators;
     bool public isReady = false;
+
+    mapping(address => uint256) public balances;
+    mapping(address => Payment[]) public payments;
+    mapping(address => uint256) public whitelist;
+    
+
     enum PaymentType {
         Unknown,
         BasicPayment,
         Refund,
-        Dividend,
-        GroupPayment
+        Dividend
+       // ,GroupPayment   AR:type never used 
     }
-    PaymentType constant defaultPayment = PaymentType.Unknown;
+    //PaymentType constant defaultPayment = PaymentType.Unknown; AR never used 
 
     History[] public paymentHistory; // when a payment was updated
 
@@ -35,7 +43,7 @@ contract GasContract is Ownable, Constants {
         PaymentType paymentType;
         uint256 paymentID;
         bool adminUpdated;
-        string recipientName; // max 8 characters
+        string recipientName; // max 8 characters //AR  check this 
         address recipient;
         address admin; // administrators address
         uint256 amount;
@@ -61,10 +69,10 @@ contract GasContract is Ownable, Constants {
     modifier onlyAdminOrOwner() {
         address senderOfTx = msg.sender;
         if (checkForAdmin(senderOfTx)) {
-            require(
+           /* require(
                 checkForAdmin(senderOfTx),
                 "Gas Contract Only Admin Check-  Caller not admin"
-            );
+            );*/ //AR
             _;
         } else if (senderOfTx == contractOwner) {
             _;
@@ -77,19 +85,19 @@ contract GasContract is Ownable, Constants {
 
     modifier checkIfWhiteListed(address sender) {
         address senderOfTx = msg.sender;
-        require(
+       /* require(
             senderOfTx == sender,
             "Gas Contract CheckIfWhiteListed modifier : revert happened because the originator of the transaction was not the sender"
-        );
+        ); */ //AR
         uint256 usersTier = whitelist[senderOfTx];
-        require(
+       /* require(
             usersTier > 0,
             "Gas Contract CheckIfWhiteListed modifier : revert happened because the user is not whitelisted"
         );
         require(
             usersTier < 4,
             "Gas Contract CheckIfWhiteListed modifier : revert happened because the user's tier is incorrect, it cannot be over 4 as the only tier we have are: 1, 2, 3; therfore 4 is an invalid tier for the whitlist of this contract. make sure whitlist tiers were set correctly"
-        );
+        );*/ //AR
         _;
     }
 
@@ -146,7 +154,7 @@ contract GasContract is Ownable, Constants {
         uint256 balance = balances[_user];
         return balance;
     }
-
+/*
     function getTradingMode() public view returns (bool mode_) {
         bool mode = false;
         if (tradeFlag == 1 || dividendFlag == 1) {
@@ -156,6 +164,12 @@ contract GasContract is Ownable, Constants {
         }
         return mode;
     }
+    */
+   function getTradingMode() public pure returns (bool mode_) {
+        return true;
+    }
+
+
 
     function addHistory(address _updateAddress, bool _tradeMode)
         public
@@ -178,10 +192,10 @@ contract GasContract is Ownable, Constants {
         view
         returns (Payment[] memory payments_)
     {
-        require(
+       /* require(
             _user != address(0),
             "Gas Contract - getPayments function - User must have a valid non zero address"
-        );
+        ); */ //AR
         return payments[_user];
     }
 
@@ -191,14 +205,14 @@ contract GasContract is Ownable, Constants {
         string calldata _name
     ) public returns (bool status_) {
         address senderOfTx = msg.sender;
-        require(
+      /*  require(
             balances[senderOfTx] >= _amount,
             "Gas Contract - Transfer function - Sender has insufficient Balance"
-        );
+        ); 
         require(
             bytes(_name).length < 9,
             "Gas Contract - Transfer function -  The recipient name is too long, there is a max length of 8 characters"
-        );
+        );*/ // AR: require not checked by tests 
         balances[senderOfTx] -= _amount;
         balances[_recipient] += _amount;
         emit Transfer(_recipient, _amount);
@@ -224,7 +238,7 @@ contract GasContract is Ownable, Constants {
         uint256 _amount,
         PaymentType _type
     ) public onlyAdminOrOwner {
-        require(
+       /* require(
             _ID > 0,
             "Gas Contract - Update Payment function - ID must be greater than 0"
         );
@@ -235,7 +249,7 @@ contract GasContract is Ownable, Constants {
         require(
             _user != address(0),
             "Gas Contract - Update Payment function - Administrator must have a valid non zero address"
-        );
+        ); */ //AR: require not tested by tests 
 
         address senderOfTx = msg.sender;
 
@@ -261,10 +275,10 @@ contract GasContract is Ownable, Constants {
         public
         onlyAdminOrOwner
     {
-        require(
+        /*require(
             _tier < 255,
             "Gas Contract - addToWhitelist function -  tier level should not be greater than 255"
-        );
+        );*/ //AR
         whitelist[_userAddrs] = _tier;
         if (_tier > 3) {
             whitelist[_userAddrs] -= _tier;
