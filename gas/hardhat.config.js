@@ -21,6 +21,9 @@ module.exports = {
     compilers: [
       {
         version: "0.8.15",
+        settings: {
+          optimizer: {enabled: process.env.DEBUG ? false : true},
+        }
       },
     ],
   },
