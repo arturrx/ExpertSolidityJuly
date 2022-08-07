@@ -63,8 +63,8 @@ contract GasContract  {
         address updatedBy;
         uint256 blockNumber;
     }*/
-    uint256 wasLastOdd = 1;
-    mapping(address => uint256) public isOddWhitelistUser;
+    //uint256 wasLastOdd = 1;
+   // mapping(address => uint256) public isOddWhitelistUser;
     struct ImportantStruct {
         uint256 valueA; // max 3 digits
         uint256 bigValue;
@@ -77,14 +77,14 @@ contract GasContract  {
    // event AddedToWhitelist(address userAddress, uint256 tier);
 
     modifier onlyAdminOrOwner() {
-        address senderOfTx = msg.sender;
-        if (checkForAdmin(senderOfTx)) {
+       // address senderOfTx = msg.sender;
+        if (checkForAdmin(msg.sender)) {
            /* require(
                 checkForAdmin(senderOfTx),
                 "Gas Contract Only Admin Check-  Caller not admin"
             );*/ //AR
             _;
-        } else if (senderOfTx == contractOwner) {
+        } else if (msg.sender == contractOwner) {
             _;
         } else {
             revert(
@@ -92,14 +92,15 @@ contract GasContract  {
             );
         }
     }
-
+//AR try to remove 
+/*
     modifier checkIfWhiteListed(address sender) {
-        address senderOfTx = msg.sender;
+      //  address senderOfTx = msg.sender;
        /* require(
             senderOfTx == sender,
             "Gas Contract CheckIfWhiteListed modifier : revert happened because the originator of the transaction was not the sender"
         ); */ //AR
-        uint256 usersTier = whitelist[senderOfTx];
+      //  uint256 usersTier = whitelist[msg.sender];
        /* require(
             usersTier > 0,
             "Gas Contract CheckIfWhiteListed modifier : revert happened because the user is not whitelisted"
@@ -107,12 +108,13 @@ contract GasContract  {
         require(
             usersTier < 4,
             "Gas Contract CheckIfWhiteListed modifier : revert happened because the user's tier is incorrect, it cannot be over 4 as the only tier we have are: 1, 2, 3; therfore 4 is an invalid tier for the whitlist of this contract. make sure whitlist tiers were set correctly"
-        );*/ //AR
+        );
         _;
     }
-
+*/
     //event supplyChanged(address indexed, uint256 indexed);
     event Transfer(address recipient, uint256 amount);
+    //event Transfer(address recipient, uint16 amount);  //AR more expensive require casting variable 
     /*event PaymentUpdated(
         address admin,
         uint256 ID,
@@ -125,7 +127,7 @@ contract GasContract  {
         contractOwner = msg.sender;
         totalSupply = _totalSupply;
 
-        for (uint256 ii = 0; ii < administrators.length; ii++) {
+        for (uint256 ii = 0; ii < 5 ; ii++) {
             if (_admins[ii] != address(0)) {
                 administrators[ii] = _admins[ii];
                 if (_admins[ii] == contractOwner) {
@@ -161,8 +163,11 @@ contract GasContract  {
     }
 
     function balanceOf(address _user) public view returns (uint256 balance_) {
-        uint256 balance = balances[_user];
-        return balance;
+        //uint256 balance = balances[_user];
+        //return balance;
+        return balances[_user];
+
+
     }
 /*
     function getTradingMode() public view returns (bool mode_) {
