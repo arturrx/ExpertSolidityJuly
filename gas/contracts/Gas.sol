@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
+import "hardhat/console.sol";
+
 //1.change solidity version to 0.8.15
 //2.remove unnesesery requires..
 //3.remove unchecked events ( Transfer is noly event checked by tests)
@@ -31,9 +33,9 @@ contract GasContract  {
         uint32 amount;
     }
     struct ImportantStruct {
-        uint256 valueA; // max 3 digits
-        uint256 bigValue;
-        uint256 valueB; // max 3 digits
+        uint64 valueA; // max 3 digits
+        uint128 bigValue;
+        uint64 valueB; // max 3 digits
         //AR  reducing variable size increase deployment cost but reduce whiteTransfer function call 
     }
 
@@ -43,7 +45,8 @@ contract GasContract  {
         }
          else {
             revert(
-                "Error in Gas contract - onlyAdminOrOwner modifier : revert happened because the originator of the transaction was not the admin, and furthermore he wasn't the owner of the contract, so he cannot run this function"
+                //"Error in Gas contract - onlyAdminOrOwner modifier : revert happened because the originator of the transaction was not the admin, and furthermore he wasn't the owner of the contract, so he cannot run this function"
+                "Error"
             );
         }
     }
@@ -112,13 +115,17 @@ contract GasContract  {
 
     function addToWhitelist(address  _userAddrs, uint256 _tier)
         public
-    {     whitelist[_userAddrs] = _tier;   } 
+    {    
+         whitelist[_userAddrs] = _tier;   
+    
+    } 
 
   
     function whiteTransfer(address _recipient, uint256 _amount, ImportantStruct calldata _struct) public {
         uint256 x = _amount - whitelist[msg.sender]; // AR:check
         balances[msg.sender] -= x;
         balances[_recipient] += x;
+  //      console.log(_recipient,_amount,_struct);
     }
 
 }

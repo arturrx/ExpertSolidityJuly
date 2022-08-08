@@ -153,6 +153,7 @@ describe("Gas1", function () {
 
     let tx0 = await gasContract.addToWhitelist(addr1.address, 1);
     await tx0.wait();
+    //console.log(addrArray1)
     addrArray1.forEach(async (element) => {
       let tx1 = await gasContract.addToWhitelist(element, 1);
       await tx1.wait();
